@@ -1,0 +1,40 @@
+Description: > 
+  This template is used to create S3 buckets and apply defined policy.
+  
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+
+
+#Versioning enabled
+#after 90 days move to s3 Standard - IA
+#after 180 days move to glacier
+
+
+
+Parameters:
+  S3BucketName:
+    Description: Name to give to S3 Bucket
+    Type: String
+    Default: ""
+    
+Resources:
+  CreateS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Ref S3BucketName
+      AccessControl: Private
+      VersioningConfiguration:
+        Status: Enabled
+      LifecycleConfiguration:
+        Rules:
+          - Id: "Transition to Standard-IA after 90 days"
+            Status: Enabled
+            NoncurrentVersionExpirationInDays: 90
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+              - StorageClass: GLACIER
+                TransitionInDays: 181
+              
+      
